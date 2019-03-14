@@ -173,7 +173,7 @@ void setup()
         kirajzol_kozben( sor, oszlop );
         xlepes();
         piros_negyzet( sor, oszlop );
-        auto ez = egymeres();
+        int ez = egymeres();
         meresek[sor][oszlop] = ez;
         if ( ez < legkisebb )
           legkisebb = ez;
@@ -186,7 +186,7 @@ void setup()
     if ( legkisebb < legnagyobb )
     {
       negyzethalo();
-      auto hatar = ( legnagyobb + legkisebb ) / 2;
+      int hatar = ( legnagyobb + legkisebb ) / 2;
 
       Serial.print("Hatar: "); Serial.println(hatar);
 
@@ -194,7 +194,7 @@ void setup()
       {
         for ( int oszlop = 0; oszlop < szelesseg; oszlop++ )
         {
-          auto ez = meresek[sor][oszlop];
+          int ez = meresek[sor][oszlop];
           if ( ez < hatar )
           {
             Serial.print("X ");

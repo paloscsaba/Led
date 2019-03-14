@@ -1,14 +1,10 @@
-#undef min
-#undef max
-#include <algorithm>
-
 #include <UTFT2.h>
 UTFT2 screen(ILI9341_16, 39, 41, 45, 47);
 
 const int szelesseg = 5;
 const int magassag = 5;
 
-constexpr auto pixelmeret = 239 / std::max( szelesseg, magassag );
+const int pixelmeret = 239 / max( szelesseg, magassag );
 
 
 int meresek[magassag][szelesseg] = {0};
@@ -18,8 +14,6 @@ void setup() {
   screen.InitLCD();
   pinMode(43, OUTPUT);
   digitalWrite(43, HIGH);
-
-
 
   Serial.begin(9600);
 
@@ -39,7 +33,7 @@ void setup() {
       kirajzol_kozben( sor, oszlop );
       delay(1000);
       piros_negyzet( sor, oszlop );
-      auto ez = egymeres();
+      int ez = egymeres();
       meresek[sor][oszlop] = ez;
       if ( ez < legkisebb )
         legkisebb = ez;
@@ -55,7 +49,7 @@ void setup() {
   if ( legkisebb < legnagyobb )
   {
     negyzethalo();
-    auto hatar = ( legnagyobb + legkisebb ) / 2;
+    int hatar = ( legnagyobb + legkisebb ) / 2;
 
     Serial.print("Hatar: "); Serial.println(hatar);
 
@@ -63,7 +57,7 @@ void setup() {
     {
       for ( int oszlop = 0; oszlop < szelesseg; oszlop++ )
       {
-        auto ez = meresek[sor][oszlop];
+        int ez = meresek[sor][oszlop];
         if ( ez < hatar )
         {
           Serial.print("X ");
@@ -75,10 +69,6 @@ void setup() {
       Serial.println();
     }
   }
-
-
-
-
 }
 
 
@@ -98,6 +88,7 @@ int egymeres()
   {
     int mert = analogRead(A0);
     atlag += mert;
+    Serial.print(i+1);Serial.print(";");Serial.println(mert);
     delay(10);
   }
   atlag /= 100;
