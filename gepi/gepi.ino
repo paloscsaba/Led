@@ -1,10 +1,11 @@
 #include <UTFT2.h>
 #include <AccelStepper.h>
 
-const int szelesseg = 5;
-const int magassag = 5;
+const int szelesseg = 8;
+const int magassag = 10;
 const int pixelmeret = 239 / max( szelesseg, magassag );
 int meresek[magassag][szelesseg] = {0};
+int hatar = 0;
 
 UTFT2 screen(ILI9341_16, 39, 41, 45, 47);
 
@@ -13,7 +14,7 @@ AccelStepper ystepper( AccelStepper::FULL4WIRE, 4, 5, 6, 7);
 
 bool xeleje()
 {
-  if ( !digitalRead(68) )
+  if ( !digitalRead(69) )
   {
     //Serial.println("xeleje!");
     return true;
@@ -23,7 +24,7 @@ bool xeleje()
 
 bool xvege()
 {
-  if ( !digitalRead(69) )
+  if ( !digitalRead(68) )
   {
     //Serial.println("xvege!");
     return true;
@@ -34,7 +35,7 @@ bool xvege()
 
 bool yeleje()
 {
-  if ( !digitalRead(3) )
+  if ( !digitalRead(2) )
   {
     //Serial.println("yeleje!");
     return true;
@@ -44,7 +45,7 @@ bool yeleje()
 
 bool yvege()
 {
-  if ( !digitalRead(2) )
+  if ( !digitalRead(3) )
   {
     //Serial.println("yvege!");
     return true;
@@ -57,7 +58,7 @@ void xvissza()
   Serial.println("xvissza");
   if ( xeleje() ) return;
 
-  xstepper.move(-8000);
+  xstepper.move(8000);
   while (xstepper.isRunning())
   {
     if ( xeleje() ) xstepper.stop();
@@ -66,7 +67,7 @@ void xvissza()
 
   while ( xeleje() )
   {
-    xstepper.move(300);
+    xstepper.move(-300);
     while (xstepper.isRunning())
     {
       if ( !xeleje() ) xstepper.stop();
@@ -82,7 +83,7 @@ void xlepes()
   Serial.println("xlepes");
   if ( xvege() ) return;
 
-  xstepper.move(500);
+  xstepper.move(-500);
   while (xstepper.isRunning())
   {
     if ( xvege() ) xstepper.stop();
@@ -95,7 +96,7 @@ void yvissza()
   Serial.println("yvissza");
   if ( yeleje() ) return;
 
-  ystepper.move(-10000);
+  ystepper.move(10000);
   while (ystepper.isRunning())
   {
     if ( yeleje() ) ystepper.stop();
@@ -108,7 +109,7 @@ void yvegig()
   Serial.println("yvegig");
   if ( yvege() ) return;
 
-  ystepper.move(10000);
+  ystepper.move(-10000);
   while (ystepper.isRunning())
   {
     if ( yvege() ) ystepper.stop();
@@ -121,13 +122,16 @@ void ylepes()
   Serial.println("ylepes");
   if ( yvege() ) return;
 
-  ystepper.move(500);
+  ystepper.move(-500);
   while (ystepper.isRunning())
   {
     if ( yvege() ) ystepper.stop();
     ystepper.run();
   }
 }
+
+
+// =======================================================
 
 void setup()
 {
@@ -180,15 +184,16 @@ void setup()
         if ( legnagyobb < ez )
           legnagyobb = ez;
         Serial.print("Ez: "); Serial.println(ez);
+        hatar = ( legnagyobb + legkisebb ) / 2;
+        Serial.print("Hatar: "); Serial.println(hatar);
       }
     }
+
 
     if ( legkisebb < legnagyobb )
     {
       negyzethalo();
-      int hatar = ( legnagyobb + legkisebb ) / 2;
 
-      Serial.print("Hatar: "); Serial.println(hatar);
 
       for ( int sor = 0; sor < magassag; sor++ )
       {
@@ -203,9 +208,10 @@ void setup()
           else
             Serial.print("  ");
         }
-        Serial.println();
+        Serial.println("|");
       }
-
+      for ( int oszlop = 0; oszlop < szelesseg; oszlop++ ) Serial.print("--");
+      Serial.println();
     }
   }
 
@@ -267,6 +273,15 @@ void kirajzol_kozben( int sor, int oszlop )
 {
   negyzethalo();
   sarga_negyzet( sor, oszlop );
+
+  for ( int rsor=0; rsor<sor; rsor++ )
+    for ( int roszlop = 0; roszlop < szelesseg; roszlop++ )
+      if ( meresek[rsor][roszlop] < hatar )
+        fekete_negyzet( rsor, roszlop );
+
+  for ( int roszlop = 0; roszlop < oszlop; roszlop++ )
+      if ( meresek[sor][roszlop] < hatar )
+        fekete_negyzet( sor, roszlop );  
 }
 
 void loop()
